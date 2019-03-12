@@ -1,0 +1,104 @@
+#!/bin/python3
+
+import math
+import os
+import random
+import re
+import sys
+
+N = 10 # global variable, # of cities
+visited = []
+connections = [] # a list of lists of cities
+
+def expense_group(num_cities, c_lib, c_road):
+    if num_cities == 0:
+        return 0
+    if c_lib > c_road:
+        return c_lib-c_road+num_cities*c_road
+    else:
+        return num_cities*c_lib
+
+def dfs_form_group(begin_city):
+    print("_______DFS________")
+    if visited[begin_city]:
+        print("city" + str(begin_city)+" has been visited.")
+        return 0
+    size_group = 0
+    stack = []
+    stack.append(begin_city)
+    visited[begin_city] = True
+    while(True):
+        print("***********")
+        print(stack)
+        if len(stack) == 0:
+            break
+        curr = stack.pop()
+        print("curr is " + str(curr))
+        size_group += 1
+        for i in range(0, len(connections[curr])):
+            if visited[connections[curr][i]] == False:
+                visited[connections[curr][i]] = True
+                stack.append(connections[curr][i])
+    return size_group
+
+
+# Complete the roadsAndLibraries function below.
+def roadsAndLibraries(n, c_lib, c_road, cities):
+    expense = 0
+
+    for i in range(0, len(cities)):
+        # print("**************")
+        # print("cities[i][0] is " + str(cities[i][0]))
+        # print("cities[i][1] is " + str(cities[i][1]))
+        if cities[i][1] not in connections[cities[i][0]]:
+                connections[cities[i][0]].append(cities[i][1])
+        if cities[i][0] not in connections[cities[i][1]]:
+            connections[cities[i][1]].append(cities[i][0])
+    print("connections is ")
+    print(connections)
+
+    for i in range(0, n):
+        size_group = dfs_form_group(i+1)
+        print("The size of the group city" + str(i+1) + " belongs to is "+str(size_group))
+        expense += expense_group(size_group, c_lib, c_road)
+    
+    return expense
+
+
+    
+    
+if __name__ == '__main__':
+    fptr = open(os.environ['OUTPUT_PATH'], 'w')
+
+    q = int(input())
+
+    for q_itr in range(q):
+        visited = []
+        connections = []
+
+        
+
+        nmC_libC_road = input().split()
+
+        N = int(nmC_libC_road[0])
+
+        for i in range(0, N+1):
+            visited.append(False)
+            connections.append([])
+
+        m = int(nmC_libC_road[1])
+
+        c_lib = int(nmC_libC_road[2])
+
+        c_road = int(nmC_libC_road[3])
+
+        cities = []
+
+        for _ in range(m):
+            cities.append(list(map(int, input().rstrip().split())))
+
+        result = roadsAndLibraries(N, c_lib, c_road, cities)
+
+        fptr.write(str(result) + '\n')
+
+    fptr.close()
